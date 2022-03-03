@@ -11,14 +11,35 @@ class Store {
     // 1、保存选项
     this._mutations = options.mutations
     this._actions = options.actions
+    this._wrapGetters = options.getters
     // 2、将用户传进来的数据做响应式处理
     // Vue.util.defineRactive(this,'state',this.$options.state)
+
+    // 定义computed 对象
+    const computed = {}
+    // 暴露getters 对象给用户  类似 $Store.getters.xxx
+    this.getters = {}
+    // 赋值下this指向
+    const Store = this
+    Object.keys(this._wrapGetters).forEach(key => {
+      // 1 、 获取用户的getters
+      // 注意 : 此时得到的是一个带有param 的 function ,需要做下封装，封装成computed 类型的无 param 的 function
+      const fn = Store._wrapGetters[key]
+      computed[key] = function () {
+        return fn(Store.state)
+      }
+      // 2、为getters定义只读属性
+      Object.defineProperty(Store.getters, key, {
+        get: () => Store._vm[key]
+      })
+    })
     this._vm = new Vue({
       data () {
         return {
           $$state: options.state
         }
-      }
+      },
+      computed
     })
     // 绑定上下文, 确保是store 实例
     this.commit = this.commit.bind(this)
