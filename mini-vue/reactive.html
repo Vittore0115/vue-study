@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  #app{
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+</style>
+<body>
+  <div id="app"></div>
+</body>
+<script>
+function defineReactive(obj,key,val) {
+  Object.defineProperty(obj,key,{
+    get (){
+      console.log('get:',key);
+      return val
+    },
+    set(v){
+      if(val !== v){
+        val = v
+      }
+      update()
+      console.log('set:',key);
+    }
+  })
+}
+
+const obj = {}
+// 对obj做响应式处理
+defineReactive(obj, 'time', '2022-03-05')  
+
+// 全量更新
+function update() {
+  app.innerHTML = obj.time
+}
+setInterval(() => {
+  obj.time = '现在是北京时间:' + `&nbsp;&nbsp;&nbsp;` + new Date().toLocaleDateString() + `&nbsp;&nbsp;&nbsp;` + new Date().toLocaleTimeString()
+}, 1000);
+</script>
+</html>
